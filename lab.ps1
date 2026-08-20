@@ -28,7 +28,7 @@ $SysPy  = 'python'
 
 function Need-Venv {
     if (-not (Test-Path $VenvPy)) {
-        Write-Host "ERROR: no virtualenv found at .venv\" -ForegroundColor Red
+        Write-Host "ERROR: no virtualenv found at .venv/" -ForegroundColor Red
         Write-Host "Run this first:  .\lab.ps1 setup"
         exit 1
     }
@@ -46,7 +46,7 @@ switch ($Target) {
     'help' {
         Write-Host ""
         Write-Host "Day 20 lab — Windows runner" -ForegroundColor Cyan
-        Write-Host "Usage:  .\lab.ps1 <target>"
+        Write-Host 'Usage:  .\lab.ps1 <target>'
         Write-Host ""
         Write-Host "Setup (00)"
         Write-Host "  probe          Probe hardware -> hardware.json"
@@ -142,7 +142,7 @@ switch ($Target) {
             benchmarks\02-*.md, benchmarks\02-*.json, benchmarks\02-*.csv,
             benchmarks\03-*.md, benchmarks\03-*.json,
             benchmarks\locust-*.csv, benchmarks\bonus-*.md, benchmarks\bonus-*.json
-        Write-Host "Cleaned generated reports. Kept hardware.json, models\, runtime\, submission\."
+        Write-Host "Cleaned generated reports. Kept hardware.json, models/, runtime/, submission/."
     }
 
     'clean-all' {
@@ -154,7 +154,7 @@ switch ($Target) {
 
     default {
         Write-Host "Unknown target: $Target" -ForegroundColor Red
-        Write-Host "Run  .\lab.ps1  with no arguments to list targets."
+        Write-Host 'Run  .\lab.ps1  with no arguments to list targets.'
         exit 1
     }
 }
