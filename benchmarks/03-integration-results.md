@@ -5,12 +5,12 @@ retrieval backend: **keyword overlap** · 3 queries
 
 | Query | Contexts retrieved | embed (ms) | retrieve (ms) | llm (ms) | total (ms) |
 |:--|--:|--:|--:|--:|--:|
-| Why is goodput more useful than raw throughp... | goodput, paged, radix | 0.0 | 0.1 | 3092.3 | 3092.4 |
-| What problem does PagedAttention actually so... | paged, radix, disagg | 0.0 | 0.1 | 2876.0 | 2876.2 |
-| When does splitting prefill and decode help?... | disagg, radix, batching | 0.0 | 0.1 | 2793.3 | 2793.4 |
+| Why is goodput more useful than raw throughp... | goodput, paged, radix | 0.0 | 0.2 | 3239.5 | 3239.8 |
+| What problem does PagedAttention actually so... | paged, radix, disagg | 0.0 | 0.0 | 2697.3 | 2697.4 |
+| When does splitting prefill and decode help?... | disagg, radix, batching | 0.0 | 0.1 | 2736.0 | 2736.1 |
 
 Mean per stage (ms): embed **0.0** · retrieve **0.1** ·
-llm **2920.5** · total **2920.7**
+llm **2890.9** · total **2891.1**
 Dominant stage: **llm** (100% of total)
 
 ## Answers returned
@@ -36,7 +36,7 @@ Dominant stage: **llm** (100% of total)
 - N19 Vector + features: Stub (Keyword overlap retrieval fallback)
 - N20 Model Serving: **Real** (`llama-server` on port 8080)
 
-The LLM generation stage (`llm`) is the overwhelming dominant bottleneck, consuming 2,920.5 ms out of 2,920.7 ms total latency (100.0% of total pipeline latency). The retrieval stage (`retrieve`) takes only 0.1 ms. This matches expectations because TF-IDF/keyword overlap search over local context docs is computationally trivial, whereas LLM prefill and token decoding require intensive transformer matrix operations.
+The LLM generation stage (`llm`) is the overwhelming dominant bottleneck, consuming 2,890.9 ms out of 2,891.1 ms total latency (100.0% of total pipeline latency). The retrieval stage (`retrieve`) takes only 0.1 ms. This matches expectations because TF-IDF/keyword overlap search over local context docs is computationally trivial, whereas LLM prefill and token decoding require intensive transformer matrix operations.
 
 To halve this pipeline's end-to-end latency by 2x, I would attack the **LLM stage**:
 1. Enable speculative decoding or lower precision quantization (e.g. UD-Q2_K_XL).

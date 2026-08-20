@@ -7,13 +7,13 @@ Completed requests: `UD-Q4_K_XL` 10/10 · `UD-Q2_K_XL` 10/10
 
 | Quantization | Size (GB) | Load (ms) | TTFT P50/P95 (ms) | TPOT P50/P95 (ms) | E2E P50/P95/P99 (ms) | Decode (tok/s) |
 |:--|--:|--:|--:|--:|--:|--:|
-| UD-Q4_K_XL | 2.97 | 5864 | 239 / 504 | 13.4 / 15.2 | 1061 / 1360 / 1360 | 74.5 |
-| UD-Q2_K_XL | 2.24 | 4271 | 237 / 344 | 13.2 / 13.5 | 1061 / 1164 / 1164 | 75.9 |
+| UD-Q4_K_XL | 2.97 | 4032 | 241 / 383 | 13.1 / 13.4 | 1071 / 1207 / 1207 | 76.5 |
+| UD-Q2_K_XL | 2.24 | 4278 | 246 / 466 | 13.4 / 14.0 | 1108 / 1336 / 1336 | 74.7 |
 
 - **TTFT** = prefill. Short prompts keep it small; long-context RAG is where it explodes.
 - **TPOT** = per-output-token decode cost, bounded by memory bandwidth. `decode tok/s = 1000 / TPOT_p50`.
-- `UD-Q2_K_XL` and `UD-Q4_K_XL` decode within 2% of each other here, for 0.73 GB difference on disk.
+- `UD-Q2_K_XL` decodes **1.02x SLOWER** than `UD-Q4_K_XL` here, despite being 0.73 GB smaller. That is a real result, not a mistake: fewer bits only buys speed when decode is limited by memory bandwidth. On a machine that is compute-limited instead — few cores, no GPU offload — the extra dequantization work of a heavily-quantized format can cost more than the bytes it saves. Say which case yours is.
 
 ## Your observation
 
-On my machine (RTX 3050 Laptop GPU 4GB), UD-Q2_K_XL saves ~0.73 GB VRAM/disk (2.24 GB vs 2.97 GB) and loads ~1.6s faster (4271 ms vs 5864 ms). Decode speed (TPOT P50 ~13.2 ms vs 13.4 ms, ~75.9 vs 74.5 tok/s) and TTFT P50 (~237 ms vs 239 ms) are nearly identical because GPU memory bandwidth on the RTX 3050 is sufficient for both weights. However, UD-Q4_K_XL offers noticeably better response quality and coherence without sacrificing speed, making UD-Q4_K_XL the superior choice for general inference on this GPU.
+On my machine (RTX 3050 Laptop GPU 4GB), UD-Q2_K_XL saves ~0.73 GB VRAM/disk (2.24 GB vs 2.97 GB), but decodes slightly slower (~74.7 tok/s vs 76.5 tok/s) and has slightly higher TTFT P95 (466 ms vs 383 ms) due to extra dequantization overhead on CUDA kernels. Because GPU VRAM bandwidth on the RTX 3050 is sufficient for 4-bit weights, UD-Q4_K_XL provides both superior reasoning quality and slightly faster decode speed, making UD-Q4_K_XL the clear recommended choice.
