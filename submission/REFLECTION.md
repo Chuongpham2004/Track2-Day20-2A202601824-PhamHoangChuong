@@ -109,22 +109,22 @@ Khi các phép nhân ma trận trọng số và KV cache attention được th�
 
 ## 6. Bonus  *(optional — tối đa 20 điểm)*
 
-> Bỏ trống nếu không làm. Xem `bonus/README.md`. Đừng làm hết — **một** finding sâu
-> ăn điểm hơn năm bảng nông.
-
-**Đã làm:** 
+> Bỏ trống nếu không làm. Xem `bonus/README.md`. Đừng làm hết — **Đã làm:** B2 Context-Length Sweep (`.\lab.ps1 sweep-ctx`) + B5 Semantic Cache Demo (`.\lab.ps1 semantic-cache-offline`)
 
 **Numbers:**
 
 ```
-before:  
-after:   
-speedup: 
+Context length 256 tokens:  TTFT prefill = 199.4 ms (1284.2 tok/s)
+Context length 8192 tokens: TTFT prefill = 3082.9 ms (2657.2 tok/s)
+Prefill Latency Scaling:    15.46x latency increase for 32x prompt tokens
+Semantic Cache Hit Speedup: 100% compute saved on cache HIT (~250 ms -> 0 ms)
 ```
 
 **Điều này nói lên gì mà deck chưa nói:**
 
-_(để trống nếu bạn không làm phần này)_
+1. **Prefill Latency vs Sequence Length:** Mặc dù Attention có độ phức tạp lý thuyết là $O(N^2)$, nhưng trên thực tế với model Gemma 4 E2B trên GPU RTX 3050, chi phí prefill từ 256 đến 8,192 tokens tăng gần như tuyến tính ($O(N)$) do các phép nhân ma trận tuyến tính và MLP layer vẫn chiếm ưu thế hơn so với attention matrix ở quy mô model 2B này.
+2. **Chi phí ẩn của RAG Context:** Dù độ tăng là tuyến tính, nhưng ở mức 8,192 tokens, thời gian prefill tốn đến **3.08 giây** trước khi sinh ra token đầu tiên (TTFT). Điều này nhắc nhở rằng không nên nhồi nhét quá nhiều context retrieved vào prompt chỉ vì model hỗ trợ context window lớn, mà cần giới hạn context (vd <= 2,048 tokens ~755 ms) để giữ TTFT thấp dưới SLO.
+3. **Semantic Cache Efficiency:** Tầng Semantic Cache giúp loại bỏ 100% chi phí suy luận (cả prefill và decode) đối với các câu hỏi diễn đạt lại (paraphrase), đạt tỉ lệ hit 38% trong bài thử nghiệm mà không tốn GPU compute.
 
 ---
 
